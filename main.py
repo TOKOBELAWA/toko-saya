@@ -3,69 +3,70 @@ import pandas as pd
 from PIL import Image
 import os
 
-# 1. KONFIGURASI TAMPILAN (Setting Tema Gelap dan Ikon Baru)
-# Perubahan penting ada di baris ini
-ICON_FILENAME = "belawa.png"
+# --- 1. KONFIGURASI HALAMAN & IKON ---
+# Memakai logo Anda sebagai ikon di tab browser
+ICON_FILENAME = "belawa2.png"
 
-# Memastikan file gambar ikon ada sebelum memakainya
 if os.path.exists(ICON_FILENAME):
     img = Image.open(ICON_FILENAME)
     st.set_page_config(
-        page_title="Toko Bela Jaya",
-        page_icon=img,  # Ikon baru memakai gambar Anda
+        page_title="Toko Belawa",
+        page_icon=img, 
         layout="centered",
-        initial_sidebar_state="collapsed",
+        initial_sidebar_state="collapsed"
     )
 else:
-    # Jika gambar tidak ketemu di GitHub, pakai ikon default
     st.set_page_config(
-        page_title="CEK MANDIRI HARGA BARANG KAMI",
-        page_icon="🛍️", # Ikon default
+        page_title="Toko Belawa",
+        page_icon="🛍️",
         layout="centered",
+        initial_sidebar_state="collapsed"
     )
 
-# --- CSS KHUSUS UNTUK TEMA GELAP & AKSEN PINK (Mewah & Modern) ---
+# --- 2. CSS TEMA CERAH (Cream & Pink) ---
 st.markdown("""
     <style>
-    /* Mengubah latar belakang utama menjadi HITAM PEKAT */
+    /* Mengubah latar belakang utama menjadi WARNA CREAM */
     .stApp {
-        background-color: #0E1117;
-        color: #FAFAFA; /* Tulisan putih agar jelas */
+        background-color: #FEFDF5; /* Warna Cream Lembut */
+        color: #333333; /* Tulisan abu-abu tua agar tidak kaku */
     }
     /* Mengubah warna teks judul (st.title) menjadi PINK CERAH */
     h1 {
         text-align: center;
-        color: #F63366 !important; /* Warna Pink/Merah Muda */
+        color: #F63366 !important; /* Warna Pink/Merah Muda Anda */
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-weight: bold;
+        margin-top: -10px;
     }
     /* Gaya untuk teks instruksi di bawah judul */
     .instruction-text {
         text-align: center;
-        color: #B0B0B0; /* Abu-abu muda */
+        color: #707070; /* Abu-abu tua */
         margin-top: -15px;
         margin-bottom: 25px;
+        font-size: 16px;
     }
-    /* Mengubah warna latar belakang kotak pencarian menjadi ABU-ABU GELAP */
+    /* Mengubah warna kotak pencarian menjadi PUTIH dengan bingkai PINK */
     .stTextInput > div > div > input {
-        background-color: #262730; /* Abu-abu tua */
-        color: #FAFAFA; /* Tulisan putih di dalam kotak */
-        border: 2px solid #4B4D52; /* Bingkai abu-abu */
+        background-color: #FFFFFF; /* Putih bersih */
+        color: #333333;
+        border: 2px solid #F63366; /* Bingkai Pink */
         border-radius: 10px;
         padding: 12px;
         font-size: 16px;
     }
-    /* Mengubah warna teks placeholder ("Cari barang...") */
+    /* Mengubah warna teks placeholder ("Ketik nama barang...") */
     .stTextInput > div > div > input::placeholder {
-        color: #808080; /* Abu-abu redup */
+        color: #B0B0B0; /* Abu-abu muda */
     }
-    /* Mengubah gaya kotak hasil harga menjadi kartu modern dengan bayangan */
+    /* Mengubah gaya kotak hasil harga menjadi kartu PUTIH modern */
     .price-card {
-        background-color: #1A1D24; /* Kartu abu-abu gelap */
+        background-color: #FFFFFF; /* Kartu Putih bersih */
         padding: 20px;
         border-radius: 15px;
         margin-bottom: 15px;
-        box-shadow: 2px 2px 10px rgba(0,0,0,0.3); /* Efek bayangan */
+        box-shadow: 0px 4px 10px rgba(0,0,0,0.05); /* Bayangan sangat halus */
         border-left: 5px solid #F63366; /* Garis vertikal pink di kiri */
     }
     /* Mengubah gaya teks harga menjadi besar, bold, dan PINK */
@@ -79,30 +80,31 @@ st.markdown("""
     .item-name {
         font-size: 22px;
         font-weight: bold;
-        color: #FAFAFA; /* Putih */
+        color: #333333; /* Abu-abu tua */
         margin-bottom: 8px;
     }
     /* Gaya untuk footer */
     .footer-text {
         text-align: center;
-        color: #808080; /* Abu-abu */
+        color: #A0A0A0; /* Abu-abu muda */
         font-size: 12px;
         margin-top: 50px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 2. JUDUL APLIKASI
-# Menampilkan Logo Anda di Atas Judul
-if os.path.exists(ICON_FILENAME):
-    img_display = Image.open(ICON_FILENAME)
-    # Menampilkan logo di tengah
-    st.image(img_display, width=150)
+# --- 3. TAMPILAN LOGO & JUDUL ---
+# Menampilkan Logo Anda di Atas Judul, ditaruh di tengah
+col1, col2, col3 = st.columns([1, 1, 1])
+with col2: # Kolom tengah
+    if os.path.exists(ICON_FILENAME):
+        st.image(ICON_FILENAME, width=150)
 
-st.title("🛒 TOKO BELAWA")
-st.markdown("<p class='instruction-text'>Ketik nama barang untuk cek harga</p>", unsafe_allow_html=True)
+st.title("Silahkan Cek Harga Barang Yang Ingin Anda Inginkan")
+st.markdown("<p class='instruction-text'>Cek harga barang jadi lebih mudah</p>", unsafe_allow_html=True)
 
-# === 3. MASUKKAN LINK HASIL PUBLISH TO WEB ANDA DI SINI ===
+# === 4. DATA GOOGLE SHEETS ===
+# === GANTI LINK DI BAWAH INI DENGAN LINK 'PUBLISH TO WEB' ANDA ===
 # Harus berakhiran pub?output=xlsx
 URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThtKCMQU9bIxl5jxsbfMKtX3B6zyRYwxuNcX4xSRzFugE4uBvj8btRryLEUgql-SDWkIvJ7Q4Wu0ih/pub?output=xlsx"
 # =======================================================
@@ -133,10 +135,11 @@ def load_data(url):
 # Panggil fungsi muat data
 df = load_data(URL)
 
-# 4. KOTAK PENCARIAN (Input Teks)
-query = st.text_input("", placeholder="🔍 Cari barang... (Contoh: Susu,Makanan,dll)")
+# --- 5. KOTAK PENCARIAN (Input Teks) ---
+# Dibuat tanpa label di atasnya, placeholder lebih jelas
+query = st.text_input("", placeholder="🔍 Ketik nama barang...")
 
-# 5. MENAMPILKAN HASIL PENCARIAN
+# --- 6. MENAMPILKAN HASIL PENCARIAN ---
 if df is not None and query:
     # Cek apakah kolom yang dibutuhkan ada
     if 'Nama Barang' in df.columns and 'Harga' in df.columns:
@@ -144,13 +147,13 @@ if df is not None and query:
         hasil = df[df['Nama Barang'].str.contains(query, case=False, na=False)]
         
         if not hasil.empty:
-            st.markdown("<h3 style='text-align: left; color: #F63366;'>Hasil Pencarian:</h3>", unsafe_allow_html=True)
+            st.markdown("<h3 style='text-align: left; color: #F63366; margin-top: 20px;'>Hasil Pencarian:</h3>", unsafe_allow_html=True)
             for i, row in hasil.iterrows():
-                # Menampilkan harga dalam kartu modern
+                # Menampilkan harga dalam kartu putih modern dengan desain bersih
                 st.markdown(f"""
                     <div class="price-card">
                         <div class="item-name">📦 {row['Nama Barang']}</div>
-                        <div style="color: #B0B0B0; font-size: 14px;">Harga:</div>
+                        <div style="color: #707070; font-size: 14px;">Harga:</div>
                         <div class="price-tag">Rp {row['Harga']:,}</div>
                     </div>
                 """, unsafe_allow_html=True)
@@ -160,5 +163,5 @@ if df is not None and query:
     else:
         st.error("Format data Google Sheets salah. Pastikan ada kolom 'Nama Barang' dan 'Harga' dengan ejaan yang sama.")
 
-# 6. TAMPILAN KAKI (FOOTER)
-st.markdown("<p class='footer-text'>Powered by Streamlit | Desain Kustom Toko Bela</p>", unsafe_allow_html=True)
+# --- 7. TAMPILAN KAKI (FOOTER) ---
+st.markdown("<p class='footer-text'>Powered by Streamlit | Desain Cerah Toko Bela Jaya</p>", unsafe_allow_html=True)
