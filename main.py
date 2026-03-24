@@ -100,7 +100,7 @@ with col2: # Kolom tengah
     if os.path.exists(ICON_FILENAME):
         st.image(ICON_FILENAME, width=150)
 
-st.title("Silahkan Cek Harga Barang Yang Ingin Anda Inginkan")
+st.title("Cek Harga Di Sini")
 st.markdown("<p class='instruction-text'>Cek harga barang jadi lebih mudah</p>", unsafe_allow_html=True)
 
 # === 4. DATA GOOGLE SHEETS ===
