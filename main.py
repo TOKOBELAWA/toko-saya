@@ -1,67 +1,111 @@
 import streamlit as st
 import pandas as pd
-from PIL import Image
-import os
 
-# 1. KONFIGURASI HALAMAN
-ICON_FILENAME = "belawa2.PNG" 
+# --- 1. KONFIGURASI HALAMAN ---
+st.set_page_config(
+    page_title="Scanner Harga SID Retail",
+    page_icon="🛒",
+    layout="centered"
+)
 
-if os.path.exists(ICON_FILENAME):
-    img = Image.open(ICON_FILENAME)
-    st.set_page_config(page_title="Toko Belawa", page_icon=img, layout="centered")
-else:
-    st.set_page_config(page_title="Toko Belawa", page_icon="🛍️", layout="centered")
-
-# 2. CSS TEMA CREAM
+# CSS Custom untuk tampilan Mobile-Friendly
 st.markdown("""
     <style>
-    .stApp { background-color: #FEFDF5; color: #333333; }
-    h1 { text-align: center; color: #F63366 !important; font-weight: bold; }
-    .stTextInput > div > div > input { border: 2px solid #F63366; border-radius: 10px; }
-    .price-card { background-color: #FFFFFF; padding: 20px; border-radius: 15px; border-left: 5px solid #F63366; box-shadow: 0px 4px 10px rgba(0,0,0,0.05); margin-bottom: 15px; }
-    .price-tag { font-size: 32px; font-weight: bold; color: #F63366; }
+    .main { background-color: #f0f2f6; }
+    .stMetric { 
+        background-color: white; 
+        padding: 20px; 
+        border-radius: 15px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    div.stButton > button:first-child {
+        background-color: #007bff;
+        color: white;
+        height: 3em;
+        border-radius: 10px;
+        font-weight: bold;
+    }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
-# 3. LOGO & JUDUL
-col1, col2, col3 = st.columns([1, 1, 1])
-with col2:
-    if os.path.exists(ICON_FILENAME):
-        st.image(ICON_FILENAME, width=150)
-
-st.title("Toko Belawa")
-
-# 4. LINK DATA (WAJIB DIISI)
-# Pastikan link di bawah ini diawali https:// dan diakhiri output=xlsx
-URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThtKCMQU9bIxl5jxsbfMKtX3B6zyRYwxuNcX4xSRzFugE4uBvj8btRryLEUgql-SDWkIvJ7Q4Wu0ih/pub?output=xlsx"
-
-@st.cache_data
-def load_data(url):
+# --- 2. FUNGSI AMBIL DATA (DATA ENGINE) ---
+@st.cache_data(ttl=60) # Cache selama 1 menit agar data tetap segar
+def load_data_from_gsheets():
+    # GANTI URL ini dengan Link 'Publish to Web' format XLSX dari Google Sheets Anda
+    URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQyWz8RRE9o3sI9Ab-xQXswT6q2ztO4kzqKF8JNGmKZi_IDBC5a2nI8ByuXxkh6NaaspPbstncGDbH4/pub?output=xlsx"
+    
     try:
-        # PENTING: Kode ini akan mengecek apakah link valid
-        df = pd.read_excel(url)
-        df.columns = df.columns.str.strip()
+        # Membaca file excel dari URL
+        df = pd.read_excel(URL)
+        
+        # --- PERBAIKAN BARCODE (Leading Zeros) ---
+        # 1. Pastikan kolom Barcode adalah string
+        # 2. Hapus spasi jika ada
+        # 3. Gunakan .zfill(3) jika barcode Anda standar 3 digit (Ganti angka 3 sesuai kebutuhan)
+        df['Barcode'] = df['Barcode'].astype(str).str.strip().str.replace('.0', '', regex=False)
+        
+        # Opsional: Jika barcode Anda panjangnya bervariasi (misal ada yang 3 digit, ada yang 13 digit),
+        # pastikan format di Google Sheets adalah 'Plain Text'.
+        
         return df
     except Exception as e:
+        st.error(f"Koneksi Gagal: {e}")
         return None
 
-df = load_data(URL)
-query = st.text_input("", placeholder="🔍 Ketik nama barang...")
+# Memanggil data
+df_produk = load_data_from_gsheets()
 
-# 5. TAMPIL HASIL
-if query:
-    if df is not None:
-        hasil = df[df['Nama Barang'].str.contains(query, case=False, na=False)]
-        if not hasil.empty:
-            for i, row in hasil.iterrows():
-                st.markdown(f"""
-                    <div class="price-card">
-                        <div style="font-size: 20px; font-weight: bold;">📦 {row['Nama Barang']}</div>
-                        <div style="color: #707070;">Harga:</div>
-                        <div class="price-tag">Rp {row['Harga']:,}</div>
-                    </div>
-                """, unsafe_allow_html=True)
-        else:
-            st.warning(f"Barang '{query}' tidak ditemukan.")
-    else:
-        st.error("Gagal mengambil data. Pastikan link di kode main.py sudah benar.")
+# --- 3. ANTARMUKA PENGGUNA (UI) ---
+st.title("🛒 Cek Harga Mandiri")
+st.info("Silakan scan barcode produk atau cari berdasarkan nama.")
+
+if df_produk is not None:
+    # TAB MENU: Scan vs Cari Manual
+    tab_scan, tab_cari = st.tabs(["📷 Scan Barcode", "🔍 Cari Nama"])
+
+    with tab_scan:
+        try:
+            from streamlit_barcode_scanner import st_barcode_scanner
+            st.write("Arahkan kamera ke Barcode produk:")
+            scan_val = st_barcode_scanner()
+
+            if scan_val:
+                # Normalisasi hasil scan
+                kode_scan = str(scan_val).strip()
+                
+                # Pencarian di DataFrame
+                hasil = df_produk[df_produk['Barcode'] == kode_scan]
+                
+                if not hasil.empty:
+                    p = hasil.iloc[0]
+                    st.success(f"### {p['Nama_Produk']}")
+                    col1, col2 = st.columns(2)
+                    col1.metric("Harga Satuan", f"Rp {p['Harga_Satuan']:,.0f}")
+                    col2.metric("Harga Grosir", f"Rp {p['Harga_Grosir']:,.0f}")
+                else:
+                    st.error(f"Barcode '{kode_scan}' tidak ditemukan.")
+        except Exception:
+            st.warning("Gagal memuat modul kamera. Gunakan tab 'Cari Nama'.")
+
+    with tab_cari:
+        input_nama = st.text_input("Ketik nama produk:", placeholder="Contoh: Sunsilk").strip()
+        
+        if input_nama:
+            # Cari nama yang mirip (case insensitive)
+            search_res = df_produk[df_produk['Nama_Produk'].str.contains(input_nama, case=False, na=False)]
+            
+            if not search_res.empty:
+                for idx, row in search_res.iterrows():
+                    with st.expander(f"📦 {row['Nama_Produk']} (ID: {row['Barcode']})"):
+                        c1, c2 = st.columns(2)
+                        c1.metric("Satuan", f"Rp {row['Harga_Satuan']:,.0f}")
+                        c2.metric("Grosir", f"Rp {row['Harga_Grosir']:,.0f}")
+            else:
+                st.error("Produk tidak ditemukan.")
+
+else:
+    st.error("Database tidak dapat diakses. Pastikan Link Google Sheets sudah benar.")
+
+# --- FOOTER ---
+st.divider()
+st.caption("Aplikasi Terhubung dengan Database SID Retail Pro via Google Sheets.")
