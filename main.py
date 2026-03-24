@@ -164,4 +164,4 @@ if df is not None and query:
         st.error("Format data Google Sheets salah. Pastikan ada kolom 'Nama Barang' dan 'Harga' dengan ejaan yang sama.")
 
 # --- 7. TAMPILAN KAKI (FOOTER) ---
-st.markdown("<p class='footer-text'>Powered by Streamlit | Desain Cerah Toko Bela Jaya</p>", unsafe_allow_html=True)
+st.markdown("<p class='footer-text'>Powered by Streamlit |TOKO BELAWA TANRUTEDONG</p>", unsafe_allow_html=True)
