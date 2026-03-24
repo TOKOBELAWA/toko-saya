@@ -81,7 +81,7 @@ def muat_data(url):
         return None
 
 # Panggil fungsi muat data
-df_harga = muat_data(URL_GOOGLE_SHEETS)
+df_harga = muat_data(https://docs.google.com/spreadsheets/d/e/2PACX-1vThtKCMQU9bIxl5jxsbfMKtX3B6zyRYwxuNcX4xSRzFugE4uBvj8btRryLEUgql-SDWkIvJ7Q4Wu0ih/pub?output=xlsx)
 
 # 5. LOGIKA PENCARIAN (Menampilkan Hasil)
 if df_harga is not None:
