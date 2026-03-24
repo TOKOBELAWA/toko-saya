@@ -56,7 +56,7 @@ nama_barang_input = st.text_input("", placeholder="🔍 Ketik nama barang (misal
 
 # 4. MEMUAT DATA DARI GOOGLE SHEETS
 # === GANTI LINK DI BAWAH INI DENGAN LINK GOOGLE SHEETS ANDA ===
-URL_GOOGLE_SHEETS = "DI_SINI_LINK_GOOGLE_SHEETS_ANDA"
+URL_GOOGLE_SHEETS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThtKCMQU9bIxl5jxsbfMKtX3B6zyRYwxuNcX4xSRzFugE4uBvj8btRryLEUgql-SDWkIvJ7Q4Wu0ih/pub?output=xlsx"
 # =============================================================
 
 @st.cache_data # Cache agar tidak download data terus-menerus
