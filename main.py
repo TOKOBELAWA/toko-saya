@@ -3,8 +3,9 @@ import pandas as pd
 from PIL import Image
 import os
 
-# 1. KONFIGURASI HALAMAN
-ICON_FILENAME = "belawa2.PNG"
+# --- 1. KONFIGURASI HALAMAN ---
+# Nama file ikon sesuai permintaan Anda
+ICON_FILENAME = "belawa2.PNG" 
 
 if os.path.exists(ICON_FILENAME):
     img = Image.open(ICON_FILENAME)
@@ -12,7 +13,7 @@ if os.path.exists(ICON_FILENAME):
 else:
     st.set_page_config(page_title="Toko Belawa", page_icon="🛍️", layout="centered")
 
-# 2. CSS TEMA CREAM CERAH (Perbaikan Titik Dua)
+# --- 2. CSS TEMA CREAM CERAH ---
 st.markdown("""
     <style>
     .stApp {
@@ -46,7 +47,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. LOGO & JUDUL
+# --- 3. LOGO & JUDUL ---
 col1, col2, col3 = st.columns([1, 1, 1])
 with col2:
     if os.path.exists(ICON_FILENAME):
@@ -55,13 +56,15 @@ with col2:
 st.title("Toko Belawa")
 st.markdown("<p style='text-align: center; color: #707070;'>Cek harga barang jadi lebih mudah</p>", unsafe_allow_html=True)
 
-# 4. LINK DATA (PASTIKAN LINK INI BENAR)
-URL = "Ihttps://docs.google.com/spreadsheets/d/e/2PACX-1vThtKCMQU9bIxl5jxsbfMKtX3B6zyRYwxuNcX4xSRzFugE4uBvj8btRryLEUgql-SDWkIvJ7Q4Wu0ih/pub?output=xlsx"
+# --- 4. DATA GOOGLE SHEETS (WAJIB GANTI LINK INI) ---
+# Masukkan link 'Publish to Web' Anda yang berakhiran output=xlsx di bawah ini:
+URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vThtKCMQU9bIxl5jxsbfMKtX3B6zyRYwxuNcX4xSRzFugE4uBvj8btRryLEUgql-SDWkIvJ7Q4Wu0ih/pub?output=xlsx"
 
 @st.cache_data
 def load_data(url):
     try:
         df = pd.read_excel(url)
+        # Bersihkan nama kolom dari spasi yang tidak sengaja terketik
         df.columns = df.columns.str.strip()
         return df
     except:
@@ -70,10 +73,13 @@ def load_data(url):
 df = load_data(URL)
 query = st.text_input("", placeholder="🔍 Ketik nama barang...")
 
-# 5. TAMPIL HASIL
+# --- 5. LOGIKA TAMPIL HARGA ---
 if df is not None and query:
+    # Mencari di kolom 'Nama Barang'
     hasil = df[df['Nama Barang'].str.contains(query, case=False, na=False)]
+    
     if not hasil.empty:
+        st.markdown("<h3 style='color: #F63366;'>Hasil:</h3>", unsafe_allow_html=True)
         for i, row in hasil.iterrows():
             st.markdown(f"""
                 <div class="price-card">
@@ -83,4 +89,6 @@ if df is not None and query:
                 </div>
             """, unsafe_allow_html=True)
     else:
-        st.warning("Barang tidak ditemukan.")
+        st.warning(f"Barang '{query}' tidak ditemukan.")
+elif df is None:
+    st.error("Data tidak terbaca. Pastikan link Google Sheets sudah benar dan sudah di-Publish to Web.")
